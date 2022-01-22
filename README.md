@@ -1,1 +1,1 @@
-# web_prices_comparator
+# Just demo, work in progess 
