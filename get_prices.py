@@ -34,6 +34,9 @@ def get_price_gigastore(url):
         soup = BeautifulSoup(r.text, "html.parser")
         # price = soup.find(id = "prices").get_text()
         price = soup.find("span", {"id": "product-detail-price-value"}).get_text()
+        #ValueError: could not convert string to float: '1.116.50'
+        if "," in price and "." in price:
+            price = price.replace(',', '')
 
     except:
         return False
@@ -44,7 +47,5 @@ def get_price_gigastore(url):
 def remove_trash(price):
 
     number = float(price.replace('€', '').replace(' ', '').replace(' ', '').replace(',', '.'))
-
-
 
     return number
