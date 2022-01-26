@@ -58,13 +58,3 @@ def get_sheet(ID, JSON):
     return values #IGNOROVAŤ
 
 
-
-"""kokot = get_sheet('114oIOb8Ml45ET3aziBiaBlOl0TpbtLMT8-fkj6xGTTM',"eshop-sheet-c38c9c8a59ed.json")
-
-print(kokot[0:4])
-print(kokot[4:8])
-
-nums = [[0,4],[4,8]]
-
-for x in range(nums[0][0],nums[0][1]):
-    print(kokot[x])"""
