@@ -25,14 +25,7 @@ def _run_workers(processes_count):
 
     print(stop_start_ids,"IDS")
 
-
-
-    """nums = [[0,num_for_process],[num_for_process,num_for_process*2],[num_for_process*2,num_for_process*3],
-            [num_for_process*3,num_for_process*4],[num_for_process*4,num_for_process*5],[num_for_process*5,num_for_process*6],[num_for_process*6,num_for_process*7],[num_for_process*7,num_for_process*8],
-            [num_for_process*8,num_for_process*9],[num_for_process*9,num_for_process*10]]"""
-
-
-
+    
     with ProcessPoolExecutor(max_workers=num) as executor:
         results = [None] * num
         for x in range(num):
