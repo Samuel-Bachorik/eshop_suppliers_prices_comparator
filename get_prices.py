@@ -1,10 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 
+headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"}
+
 def get_price_alza(url):
 
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"}
     r = requests.get(url, headers=headers)
     soup = BeautifulSoup(r.text, "html.parser")
     # price = soup.find(id = "prices").get_text()
@@ -13,9 +14,8 @@ def get_price_alza(url):
     return price
 
 def get_price_heureka(url):
+    
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"}
         r = requests.get(url, headers=headers)
         price = r.text.split("\"minPrice\":")[1].split(",")[0]
 
@@ -24,17 +24,16 @@ def get_price_heureka(url):
 
     return price
 
+
+""" DODAVATELIA """
+
 def get_price_gigastore(url):
-
+    
     try:
-
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"}
         r = requests.get(url, headers=headers)
         soup = BeautifulSoup(r.text, "html.parser")
-        # price = soup.find(id = "prices").get_text()
         price = soup.find("span", {"id": "product-detail-price-value"}).get_text()
-        #ValueError: could not convert string to float: '1.116.50'
+        
         if "," in price and "." in price:
             price = price.replace(',', '')
 
@@ -42,6 +41,63 @@ def get_price_gigastore(url):
         return False
 
     return price
+
+def get_price_tvojpc(url):
+
+    try:
+        r = requests.get(url, headers=headers)
+        soup = BeautifulSoup(r.text, "html.parser")
+        price = soup.find("span", {"class": "woocommerce-Price-amount amount"}).get_text()
+
+    except:
+        return False
+
+    try:
+        soup.find("p", {"class": "stock out-of-stock"}).get_text()
+
+        return "NEDOSTUPNE"
+
+    except:
+        return price
+
+
+def get_price_axdata(url):
+
+    try:
+        r = requests.get(url, headers=headers)
+        soup = BeautifulSoup(r.text, "html.parser")
+        price = soup.find("span", {"itemprop": "price"}).get_text()
+
+    except:
+        return False
+
+    try:
+        soup.find("span", {"class": "product-available"}).get_text()
+
+    except:
+        return "NEDOSTUPNE"
+
+    return price
+
+
+def get_price_datacomp(url):
+
+    try:
+        r = requests.get(url, headers=headers)
+        r_text = r.text
+        soup = BeautifulSoup(r_text, "html.parser")
+        price = soup.find("div", {"class": "prc wvat abs"}).get_text()
+
+    except:
+        return False
+
+    try:
+        soup.find("span", {"class": "avail_ico avail_ok"}).get_text()
+
+    except:
+        return "NEDOSTUPNE"
+
+    return price.replace('Â', '').replace('', '').replace('â', '').replace('¬', '').replace(' ', '')
 
 
 def remove_trash(price):
