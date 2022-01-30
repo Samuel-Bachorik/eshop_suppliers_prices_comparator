@@ -42,7 +42,7 @@ def _run_workers(processes_count):
             for x in i:
                 print(x)
 
-        print("This task took %s seconds" % (time.time() - start_time))
+        print("\n\nThis task took %s seconds" % (time.time() - start_time))
 
 
 def process(sheet, start_stop):
