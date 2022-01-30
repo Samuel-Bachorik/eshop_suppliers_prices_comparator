@@ -1,6 +1,6 @@
 # Just demo, work in progess 
 
-Piece ofprogram that helps my e-shop to get the cheapest suppliers of all products. This program evaluates whether the goods are still in stock, whether the selected margin is achievable with current supplier prices and if supplier deleted product or changed the price of product. This program also finds out if there is a cheaper supplier than the one I have.
+Piece of program that helps my e-shop to get the cheapest suppliers of all products. This program evaluates whether the goods are still in stock, whether the selected margin is achievable with current supplier prices and if supplier deleted product or changed the price of product. This program also finds out if there is a cheaper supplier than the one I have.
 
 ### What it does
 - For each product, it can handle a different supplier
