@@ -10,11 +10,11 @@ Piece ofprogram that helps my e-shop to get the cheapest suppliers of all produc
 - Checks if suplier changed the price
 ### How it works
 
-- I created my own database of products in Google Sheets
+- I created my own database of products in Google Sheets (Manually added products)
 - This database consist of 3 columns - My shop, supplier, Heureka
 - Web scraper takes prices and availablity out of theese websites
 - All of this runs on multiprocessing
 - The number of processed products is divided between the processes
-- 
 
-### If the program finds a mismatch it throws warning and number of product
+![Table](https://github.com/Samuel-Bachorik/eshop_suppliers_prices_comparator/blob/main/table.jpg)
+### If the program finds a mismatch it throws warning and number row in table
