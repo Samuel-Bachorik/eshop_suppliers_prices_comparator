@@ -1,9 +1,10 @@
 from google_sheets import get_sheet
 from get_prices import get_price_alza, get_price_heureka, get_price_gigastore, get_price_axdata,get_price_tvojpc\
     ,get_price_dmcomp,get_price_datacomp,get_price_prva,get_price_zdomu,remove_trash
+
 from concurrent.futures import ProcessPoolExecutor
 import concurrent.futures
-import os
+
 import time
 
 ID = '114oIOb8Ml45ET3aziBiaBlOl0TpbtLMT8-fkj6xGTTM'
@@ -66,12 +67,14 @@ def process(sheet, start_stop):
         price_alza = get_price_alza(sheet[i][0])
 
         if price_supplier == "UNAVAILABLE":
-            errors.append("Product " + str(i + 2) + " is unavailable")
+            errors.append("\033[1m" + '\033[91m' + "Product " + str(i + 2) + " is unavailable" + "\033[0m")
 
             continue
 
         if price_heureka  == False or price_supplier == False:
-            errors.append("Product "+  str(i+2) + " dissapeared from supplier database")
+
+
+            errors.append("\033[1m" + '\033[91m' + "Product " + str(i + 2) + " dissapeared from supplier database" + "\033[0m")
 
             continue
 
@@ -89,14 +92,25 @@ def process(sheet, start_stop):
         if (abs(price_alza - price_supplier) / price_supplier) * 100.0 < margin_in_percent:
             product_margin_err = True
 
-        if supplier_price_err or lowest_price_err or product_margin_err:
+        error = "\033[1m" + '\033[91m' + "At product "  + str(i+2) +" - "  +"\033[0m"
+
+        if supplier_price_err: error+= " Price of supplier is higher ||| "
+
+        if lowest_price_err: error+= " Lower price exist ||| "
+
+        if product_margin_err: error += " Margin is low"
+
+        """if supplier_price_err or lowest_price_err or product_margin_err:
             errors.append("At product "+ str(i+2) + " Price of supplier is higher - " + str(supplier_price_err) +
-                          "   |||   Lower price exist - " + str(lowest_price_err)+"   |||   Low margin - " + str(product_margin_err))
+                          "   |||   Lower price exist - " + str(lowest_price_err)+"   |||   Low margin - " + str(product_margin_err))"""
+
+        if supplier_price_err or lowest_price_err or product_margin_err:
+            errors.append(error)
 
     return errors
 
 
 if __name__ == '__main__':
-    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+    _run_workers(processes_count= 30)
 
-    _run_workers(processes_count= 10)
+
