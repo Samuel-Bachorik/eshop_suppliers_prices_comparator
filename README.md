@@ -16,6 +16,6 @@ Piece of program that helps my e-shop to get the cheapest suppliers of all produ
 - All of this runs on multiprocessing
 - The number of processed products is divided between the processes
 
-### If the program finds a mismatch it throws warning and number row in table
+### If the program finds a mismatch or any of problems it throws warning and number of row in table
 
 ![Table](https://github.com/Samuel-Bachorik/eshop_suppliers_prices_comparator/blob/main/table.jpg)
