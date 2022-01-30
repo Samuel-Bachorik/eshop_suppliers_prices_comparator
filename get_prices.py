@@ -14,7 +14,7 @@ def get_price_alza(url):
     return price
 
 def get_price_heureka(url):
-    
+
     try:
         r = requests.get(url, headers=headers)
         price = r.text.split("\"minPrice\":")[1].split(",")[0]
@@ -28,12 +28,12 @@ def get_price_heureka(url):
 """ DODAVATELIA """
 
 def get_price_gigastore(url):
-    
+
     try:
         r = requests.get(url, headers=headers)
         soup = BeautifulSoup(r.text, "html.parser")
         price = soup.find("span", {"id": "product-detail-price-value"}).get_text()
-        
+
         if "," in price and "." in price:
             price = price.replace(',', '')
 
@@ -41,6 +41,30 @@ def get_price_gigastore(url):
         return False
 
     return price
+
+
+def get_price_prva(url):
+
+    try:
+        r = requests.get(url, headers=headers)
+        soup = BeautifulSoup(r.text, "html.parser")
+        price = soup.find("span", {"class": "price price-default"}).get_text()
+
+    except:
+        return False
+
+    try:
+        s = soup.find("a", {"id": "ctl105_i3Shop_Product_Info3Repeater_ctl01_i3Shop_Product_Info3products_spedition_days"}).get_text()
+
+        if "(Nie je skladom)" in s:
+            return "UNAVAILABLE"
+
+        else:
+            return price
+
+    except:
+        return False
+
 
 def get_price_tvojpc(url):
 
@@ -55,7 +79,7 @@ def get_price_tvojpc(url):
     try:
         soup.find("p", {"class": "stock out-of-stock"}).get_text()
 
-        return "NEDOSTUPNE"
+        return "UNAVAILABLE"
 
     except:
         return price
@@ -75,7 +99,7 @@ def get_price_axdata(url):
         soup.find("span", {"class": "product-available"}).get_text()
 
     except:
-        return "NEDOSTUPNE"
+        return "UNAVAILABLE"
 
     return price
 
@@ -95,9 +119,59 @@ def get_price_datacomp(url):
         soup.find("span", {"class": "avail_ico avail_ok"}).get_text()
 
     except:
-        return "NEDOSTUPNE"
+        return "UNAVAILABLE"
 
     return price.replace('Â', '').replace('', '').replace('â', '').replace('¬', '').replace(' ', '')
+
+
+def get_price_dmcomp(url):
+
+    try:
+        r = requests.get(url, headers=headers)
+        r_text = r.text
+        soup = BeautifulSoup(r_text, "html.parser")
+        price = soup.find("strong", {"class": "price sub-left-position"}).get_text()
+
+    except:
+        return False
+
+    try:
+        s = soup.find("span", {"class": "strong"}).get_text().replace('Â', '').replace('', '')\
+            .replace('â', '').replace('¬', '').replace(' ', '').replace('€', '').replace(' ', '').replace(' ', '').replace(',', '.')
+
+        if "Vypredané" in s:
+            return "UNAVAILABLE"
+
+    except:
+        return "UNAVAILABLE"
+
+    return price
+
+
+def get_price_zdomu(url):
+
+    try:
+        r = requests.get(url, headers=headers)
+        r_text = r.text
+
+
+        soup = BeautifulSoup(r_text, "html.parser")
+        price = soup.find("span", {"itemprop": "price"}).get_text()
+
+    except:
+        return False
+
+    try:
+
+        x = r_text.split("<span class=\"control-label\">Kód: </span>")[0].split("<div class=\"product-information\">")[1].split("TEXT")
+
+        if "nie je skladom" in x:
+            return "UNAVAILABLE"
+
+    except:
+        return "UNAVAILABLE"
+
+    return price
 
 
 def remove_trash(price):
