@@ -18,7 +18,6 @@ def get_sheet(ID, JSON):
         SERVICE_ACCOUNT_FILE,scopes = SCOPES
     )
 
-
     SAMPLE_SPREADSHEET_ID = ID
     SAMPLE_RANGE_NAME = 'Linky!A2:C121'
 
@@ -45,16 +44,8 @@ def get_sheet(ID, JSON):
 
     except HttpError as err:
         print(err)
-
-    """service = build('sheets', 'v4', credentials=creds)
-    sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-                                    range=SAMPLE_RANGE_NAME).execute()
-    values = result.get('values', [])"""
-
-
+    print("Google sheets ready...")
 
 
     return values #IGNOROVAŤ
-
 
