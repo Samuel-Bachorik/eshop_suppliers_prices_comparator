@@ -1,14 +1,8 @@
 from __future__ import print_function
-
-import os.path
 from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
 from google.oauth2 import service_account
-
 
 def get_sheet(ID, JSON):
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -19,7 +13,7 @@ def get_sheet(ID, JSON):
     )
 
     SAMPLE_SPREADSHEET_ID = ID
-    SAMPLE_RANGE_NAME = 'Linky!A2:C121'
+    SAMPLE_RANGE_NAME = 'Linky!A2:C161'
 
     creds = credentials
 
@@ -47,5 +41,4 @@ def get_sheet(ID, JSON):
     print("Google sheets ready...")
 
 
-    return values #IGNOROVAŤ
-
+    return values
