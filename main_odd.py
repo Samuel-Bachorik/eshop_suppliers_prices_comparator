@@ -1,53 +1,133 @@
-from __future__ import print_function
+from google_sheets import get_sheet
+from get_prices import get_price_alza, get_price_heureka, get_price_gigastore, get_price_axdata, get_price_tvojpc\
+    ,get_price_dmcomp,get_price_datacomp,get_price_prva,get_price_zdomu,remove_trash
 
-import os.path
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+from concurrent.futures import ProcessPoolExecutor
+import concurrent.futures
+import time
+import math
 
-from google.oauth2 import service_account
+def _run_workers(processes_count, sheets, odd_residue = None):
 
+    num = processes_count
 
-def get_sheet(ID, JSON):
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-    SERVICE_ACCOUNT_FILE = JSON
+    if odd_residue is None:
+        num_for_process = int(len(sheets)/num)
 
-    credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE,scopes = SCOPES
-    )
+        stop_start_ids = [[0 for _ in range(2)] for _ in range(num)]
 
-    SAMPLE_SPREADSHEET_ID = ID
-    SAMPLE_RANGE_NAME = 'Linky!A2:C161'
+        for z in range(num):
+            if z == 0:
+                stop_start_ids[z][1] = num_for_process
 
-    creds = credentials
+            stop_start_ids[z][0] = stop_start_ids[z-1][1]
+            stop_start_ids[z][1] = stop_start_ids[z][0] + num_for_process
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            pass
+        print("Started...\n")
 
-    try:
-        service = build('sheets', 'v4', credentials=creds)
+    else:
+        stop_start_ids = [[len(sheets) - odd_residue ,len(sheets)]]
 
-        sheet = service.spreadsheets()
-        result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-                                    range=SAMPLE_RANGE_NAME).execute()
-        values = result.get('values', [])
+    with ProcessPoolExecutor(max_workers=num) as executor:
+        results = [None] * num
+        for x in range(num):
+            results[x] = executor.submit(process, sheets, stop_start_ids[x])
 
-        if not values:
-            print('Žiadne dáta.')
-            return
+        errors = []
+        for f in concurrent.futures.as_completed(results):
+            x = f.result()
+            errors.append(x)
 
-
-    except HttpError as err:
-        print(err)
-    print("Google sheets ready...")
+        return errors
 
 
-    return values #IGNOROVAŤ
+def process(sheet, start_stop):
+    errors = []
+    supplier_database = ["gigastore", "datacomp", "axdata", "tvojpc", "zdomu", "prva", "dmcomp"]
+    supplier_database_f = [get_price_gigastore, get_price_datacomp, get_price_axdata, get_price_tvojpc,
+                         get_price_zdomu, get_price_prva, get_price_dmcomp]
+
+    for i in range(start_stop[0],start_stop[1]):
+
+        margin_in_percent = 10
+
+        supplier_price_err = False
+        product_margin_err = False
+        lowest_price_err = False
+
+        for j in range(len(supplier_database)):
+            if supplier_database[j] in sheet[i][1]:
+                price_supplier = supplier_database_f[j](sheet[i][1])
+
+        price_heureka = get_price_heureka(sheet[i][2])
+        price_alza = get_price_alza(sheet[i][0])
+
+        if price_supplier == "UNAVAILABLE":
+            errors.append("\033[1m" + '\033[91m' + "Product " + str(i + 2) + " is unavailable" + "\033[0m")
+
+            continue
+
+        if price_heureka  == False or price_supplier == False:
+            errors.append("\033[1m" + '\033[91m' + "Product " + str(i + 2) + " dissapeared from supplier database" + "\033[0m")
+
+            continue
+
+        price_supplier = remove_trash(price_supplier)
+        price_heureka = remove_trash(price_heureka)
+        price_alza = remove_trash(price_alza)
+
+        if price_alza < price_supplier:
+            supplier_price_err = True
+
+        if price_heureka < price_alza:
+            lowest_price_err = True
+
+        if (abs(price_alza - price_supplier) / price_supplier) * 100.0 < margin_in_percent:
+            product_margin_err = True
+
+        error = "\033[1m" + '\033[91m' + "At product "  + str(i+2) +" - "  +"\033[0m"
+
+        if supplier_price_err: error+= " Price of supplier is higher ||| "
+        if lowest_price_err: error+= " Lower price exist ||| "
+        if product_margin_err: error += " Margin is low"
+
+        if supplier_price_err or lowest_price_err or product_margin_err:
+            errors.append(error)
+
+    return errors
 
 
+def print_errors(errors):
+    for i in errors:
+        for x in i:
+            print(x)
 
+if __name__ == '__main__':
+    ID = '114oIOb8Ml45ET3aziBiaBlOl0TpbtLMT8-fkj6xGTTM'
+    JSON_KLUC = "eshop-sheet-c38c9c8a59ed.json"
+    sheets = get_sheet(ID, JSON_KLUC)
+    processes_count = 40
+    odd_residue = len(sheets) - (processes_count * (math.floor(len(sheets) / processes_count)))
+    start_time = time.time()
+
+    if odd_residue != 0:
+        print("Processing an odd number of products...")
+        sheets0 = sheets[0:len(sheets)-odd_residue]
+
+        errors =_run_workers(processes_count=processes_count, sheets=sheets0)
+
+        errors0 = _run_workers(processes_count=1, sheets=sheets, odd_residue= odd_residue)
+
+        for k in errors0:
+            errors.append(k)
+
+        print_errors(errors)
+
+        print("\n\n--This task took %s seconds--" % (time.time() - start_time))
+
+    else:
+        print("Processing an even number of products")
+        errors = _run_workers(processes_count=processes_count, sheets=sheets)
+
+        print_errors(errors)
+        print("\n\n--This task took %s seconds--" % (time.time() - start_time))
