@@ -175,6 +175,59 @@ class Price_Scraper:
 
         return price
 
+    def get_price_extremecomp(self, url):
+
+        try:
+            r = requests.get(url, headers= self.headers)
+            r_text = r.text
+
+            soup = BeautifulSoup(r_text, "html.parser")
+            price = soup.find("span", {"class": "cenasdph"}).get_text().replace('Â', '').replace('', '') \
+                .replace('â', '').replace('¬', '').replace(' ', '').replace('€', '').replace(' ', '').replace(' ',
+                                                                                                              '').replace(
+                ',', '.')
+
+        except:
+            return False
+
+        try:
+
+            soup.find("p", {"class": "skladom"}).get_text()
+
+        except:
+            return "UNAVAILABLE"
+
+        return price
+
+    def get_price_hejsk(self, url):
+
+        try:
+            r = requests.get(url, headers= self.headers)
+            r_text = r.text
+
+            soup = BeautifulSoup(r_text, "html.parser")
+            price = soup.find("span", {"id": "real_price"}).get_text()
+        except:
+            return False
+
+        try:
+            soup.find("span", {"class": "not-available"}).get_text()
+
+            return "UNAVAILABLE"
+
+        except:
+            try:
+                soup.find("span", {"class": "available supplier"}).get_text()
+                return "UNAVAILABLE"
+
+            except:
+                try:
+                    soup.find("span", {"class": "date-available"}).get_text()
+                    return "UNAVAILABLE"
+
+                except:
+                    return price
+
 
     def remove_trash(self, price):
 
