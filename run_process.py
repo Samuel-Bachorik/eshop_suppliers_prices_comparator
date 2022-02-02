@@ -16,12 +16,18 @@ class Process:
         self.get_price_dmcomp       = price_scraper.get_price_dmcomp
         self.get_price_extremecomp  = price_scraper.get_price_extremecomp
         self.get_price_hejsk        = price_scraper.get_price_hejsk
+        self.get_price_andreashop   = price_scraper.get_price_andreashop
+        self.get_price_mobilonline  = price_scraper.get_price_mobilonline
+        self.get_price_mobilecare   = price_scraper.get_price_mobilecare
+
 
     def process(self,sheet, start_stop):
         errors = []
-        supplier_database = ["gigastore", "datacomp", "axdata", "tvojpc", "zdomu", "prva", "dmcomp", "extremepcshop", "hej"]
+        supplier_database = ["gigastore", "datacomp", "axdata", "tvojpc", "zdomu", "prva", "dmcomp", "extremepcshop", "hej", "andreashop", "mobilonline",
+                             "mobilecare"]
         supplier_database_f = [self.get_price_gigastore, self.get_price_datacomp, self.get_price_axdata, self.get_price_tvojpc,
-                               self.get_price_zdomu, self.get_price_prva, self.get_price_dmcomp,self.get_price_extremecomp,self.get_price_hejsk]
+                               self.get_price_zdomu, self.get_price_prva, self.get_price_dmcomp,self.get_price_extremecomp,self.get_price_hejsk,
+                               self.get_price_andreashop,self.get_price_mobilonline,self.get_price_mobilecare]
 
         for i in range(start_stop[0], start_stop[1]):
 
