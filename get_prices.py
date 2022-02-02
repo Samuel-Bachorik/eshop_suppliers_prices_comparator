@@ -10,7 +10,6 @@ class Price_Scraper:
 
         r = requests.get(url, headers= self.headers)
         soup = BeautifulSoup(r.text, "html.parser")
-        # price = soup.find(id = "prices").get_text()
         price = soup.find("span", {"class": "price_withVat"}).get_text()
 
         return price
@@ -25,7 +24,6 @@ class Price_Scraper:
             return False
 
         return price
-
 
     """ DODAVATELIA """
 
@@ -175,6 +173,7 @@ class Price_Scraper:
 
         return price
 
+
     def get_price_extremecomp(self, url):
 
         try:
@@ -198,6 +197,7 @@ class Price_Scraper:
             return "UNAVAILABLE"
 
         return price
+
 
     def get_price_hejsk(self, url):
 
@@ -229,8 +229,63 @@ class Price_Scraper:
                     return price
 
 
-    def remove_trash(self, price):
+    def get_price_andreashop(self, url):
 
+        try:
+            r = requests.get(url, headers= self.headers)
+            r_text = r.text
+
+            soup = BeautifulSoup(r_text, "html.parser")
+            price = soup.find("div", {"class": "value"}).get_text()
+
+        except:
+            return False
+
+        try:
+            soup.find("div", {"class": "dostupnost stav-1 tooltip tooltip"}).get_text()
+
+
+        except:
+            return "UNAVAILABLE"
+
+        return price
+
+    def get_price_mobilonline(self, url):
+
+        try:
+            r = requests.get(url, headers= self.headers)
+            r_text = r.text
+
+            soup = BeautifulSoup(r_text, "html.parser")
+            price = soup.find("span", {"class": "ProductNormal_page_final-price__1sJYS"}).get_text()
+
+        except:
+            return False
+
+        return price
+
+    def get_price_mobilecare(self, url):
+
+        try:
+            r = requests.get(url, headers= self.headers)
+            r_text = r.text
+
+            soup = BeautifulSoup(r_text, "html.parser")
+            price = soup.find("span", {"class": "woocommerce-Price-amount amount"}).get_text()
+
+        except:
+            return False
+
+        try:
+            soup.find("p", {"class": "stock in-stock"}).get_text()
+
+        except:
+            return "UNAVAILABLE"
+
+        return price
+
+
+    def remove_trash(self, price):
         number = float(price.replace('€', '').replace(' ', '').replace(' ', '').replace(',', '.'))
 
         return number
