@@ -182,9 +182,8 @@ class Price_Scraper:
 
             soup = BeautifulSoup(r_text, "html.parser")
             price = soup.find("span", {"class": "cenasdph"}).get_text().replace('Â', '').replace('', '') \
-                .replace('â', '').replace('¬', '').replace(' ', '').replace('€', '').replace(' ', '').replace(' ',
-                                                                                                              '').replace(
-                ',', '.')
+                .replace('â', '').replace('¬', '').replace(' ', '').replace('€', '').replace(' ', '').replace(' ','')\
+                .replace(',', '.')
 
         except:
             return False
