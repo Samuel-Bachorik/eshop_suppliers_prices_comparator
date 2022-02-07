@@ -19,19 +19,26 @@ class Process:
         self.get_price_andreashop   = price_scraper.get_price_andreashop
         self.get_price_mobilonline  = price_scraper.get_price_mobilonline
         self.get_price_mobilecare   = price_scraper.get_price_mobilecare
-
+        self.get_price_danimani     = price_scraper.get_price_danimani
+        self.get_price_mobilpc      = price_scraper.get_price_mobilpc
+        self.get_price_lacnenakupy  = price_scraper.get_price_lacnenakupy
+        self.get_price_datart       = price_scraper.get_price_datart
+        self.get_price_pricemarket  = price_scraper.get_price_pricemarket
 
     def process(self,sheet, start_stop):
         errors = []
         supplier_database = ["gigastore", "datacomp", "axdata", "tvojpc", "zdomu", "prva", "dmcomp", "extremepcshop", "hej", "andreashop", "mobilonline",
-                             "mobilecare"]
+                             "mobilecare", "danimani", "mobilpc", "lacne-nakupy", "datart", "pricemarket"]
+
         supplier_database_f = [self.get_price_gigastore, self.get_price_datacomp, self.get_price_axdata, self.get_price_tvojpc,
-                               self.get_price_zdomu, self.get_price_prva, self.get_price_dmcomp,self.get_price_extremecomp,self.get_price_hejsk,
-                               self.get_price_andreashop,self.get_price_mobilonline,self.get_price_mobilecare]
+                               self.get_price_zdomu, self.get_price_prva, self.get_price_dmcomp, self.get_price_extremecomp, self.get_price_hejsk,
+                               self.get_price_andreashop, self.get_price_mobilonline, self.get_price_mobilecare, self.get_price_danimani, self.get_price_mobilpc,
+                               self.get_price_lacnenakupy, self.get_price_datart, self.get_price_pricemarket]
+
 
         for i in range(start_stop[0], start_stop[1]):
 
-            margin_in_percent = 10
+            margin_in_percent = 2.7
 
             supplier_price_err = False
             product_margin_err = False
@@ -40,30 +47,32 @@ class Process:
             for j in range(len(supplier_database)):
                 if supplier_database[j] in sheet[i][1]:
                     price_supplier = supplier_database_f[j](sheet[i][1])
+                    break
 
             price_heureka = self.get_price_heureka(sheet[i][2])
-            price_alza = self.get_price_alza(sheet[i][0])
+            price_alza = float(sheet[i][0])
 
             if price_supplier == "UNAVAILABLE":
                 errors.append("\033[1m" + '\033[91m' + "Product " + str(i + 2) + " is unavailable" + "\033[0m")
 
                 continue
 
-            if price_heureka == False or price_supplier == False:
+            if price_heureka == False or price_supplier == False :
                 errors.append("\033[1m" + '\033[91m' + "Product " + str(
                     i + 2) + " dissapeared from supplier database" + "\033[0m")
 
                 continue
 
             price_supplier = self.remove_trash(price_supplier)
-            price_heureka = self.remove_trash(price_heureka)
-            price_alza = self.remove_trash(price_alza)
+
+            #price_heureka = self.remove_trash(price_heureka)
+            #price_alza = self.remove_trash(price_alza)
 
             if price_alza < price_supplier:
                 supplier_price_err = True
 
-            if price_heureka < price_alza:
-                lowest_price_err = True
+            #if price_heureka < price_alza:
+             #   lowest_price_err = True
 
             if (abs(price_alza - price_supplier) / price_supplier) * 100.0 < margin_in_percent:
                 product_margin_err = True
@@ -71,7 +80,7 @@ class Process:
             error = "\033[1m" + '\033[91m' + "At product " + str(i + 2) + " - " + "\033[0m"
 
             if supplier_price_err: error += " Price of supplier is higher ||| "
-            if lowest_price_err: error += " Lower price exist ||| "
+            #if lowest_price_err: error += " Lower price exist ||| "
             if product_margin_err: error += " Margin is low"
 
             if supplier_price_err or lowest_price_err or product_margin_err:
