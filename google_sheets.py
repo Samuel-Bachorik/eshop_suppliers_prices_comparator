@@ -13,7 +13,7 @@ def get_sheet(ID, JSON):
     )
 
     SAMPLE_SPREADSHEET_ID = ID
-    SAMPLE_RANGE_NAME = 'Linky!A2:C161'
+    SAMPLE_RANGE_NAME = 'Linky!A2:C514'
 
     creds = credentials
 
